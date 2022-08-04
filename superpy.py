@@ -16,10 +16,6 @@ __human_name__ = "superpy"
 def main():
     pass
 #import datetime for the concept of now, today, yesterday and expiration date
-
-
-
-
 #import CSV module to write and read csv files
 #implement the header of the bought.csv
 header = ['id', 'product_name', 'buy_price', 'expiration_date']
@@ -40,9 +36,10 @@ with open('bought.csv', 'w') as f:
     print(f)
     #import argparse for help function in command line
     #start initiating argparse
+def Superpy(buy, command_line):
     parser = argparse.ArgumentParser('Superpy')
-    parser.add_argument('inventory', type=str, help ='inventory info')
-    subparsers = parser.add_argument()
+    parser.add_argument('--debug', action='store_true', help ='print debug info')
+    subparsers = parser.add_subparsers(dest = 'command')
     #id, product_name and expiration date of the products bought, content of the file bought.csv
     buy = subparsers.add_parser('id', type = int, help = 'identification number of the bought product')
     buy.add_argument('product_name', type = str, help='name of the product')
@@ -82,9 +79,10 @@ with open('sold.csv', 'w') as f:
     print(f)
     #import argparse for help function in command line
     #start initiating argparse
+def Superpy(sell, command_line):
     parser = argparse.ArgumentParser('Superpy')
-    parser.add_argument('inventory', type=str, help ='inventory info')
-    subparsers = parser.add_argument()
+    parser.add_argument('--debug', action='store_true', help ='print debug info')
+    subparsers = parser.add_subparsers(dest = 'command')
     #id, bought_id, sell_date and sell_price of the products sold, content of the file sold.csv
     sell = subparsers.add_parser('id', type = int, help = 'identification number of the sold product')
     sell.add_argument('sell_date', type = int, help = 'date of the sold product') 
