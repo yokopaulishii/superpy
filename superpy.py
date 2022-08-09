@@ -1,6 +1,8 @@
 # Imports
 import argparse
 import csv
+import os
+import sys
 from datetime import date
 from datetime import timedelta
 from datetime import tzinfo
@@ -15,80 +17,48 @@ __human_name__ = "superpy"
 # Your code below this line.
 def main():
     pass
-#import datetime for the concept of now, today, yesterday and expiration date
-#import CSV module to write and read csv files
-#implement the header of the bought.csv
-header = ['id', 'product_name', 'buy_price', 'expiration_date']
-#implement the data of the bought.csv
-data = [
+#start superpy command tool
+#create the parser
+buy_parser=argparse.ArgumentParser(prog='superpy', description='buy_inventory')
+#add the arguments
+buy_parser.add_argument('id', help='identification number of the product bought', type = int)
+buy_parser.add_argument('product_name', help = 'name of the product bought', type = str)
+buy_parser.add_argument('buy_price', help='cost price of the product bought', type = float)
+buy_parser.add_argument('expiration_date', help='expiration date of the product bought: yyyy-mm-dd', type = str)
+#execute the parse_args() method
+args = buy_parser.parse_args()
+
+print(vars(args))
+
+#create the parser
+sell_parser=argparse.ArgumentParser(prog='superpy', description='sell_inventory')
+#add the arguments
+sell_parser.add_argument('id', help='identification number of the product sold', type = int)
+sell_parser.add_argument('bought_id', help = 'name of the product bought', type = str)
+sell_parser.add_argument('sell_date', help='date of the product sold: yyyy-mm-dd', type = int)
+sell_parser.add_argument('sell-price', help='price of the product sold', type = float)
+
+csv_buy_rowlist = [
+    ['id', 'product_name', 'buy_price', 'expiration_date']
     [1, 'milk', 1.50, 2022-10-10]
     [2, 'bread', 2.50, 2022-10-10]
     [3, 'butter', 3.50, 2022-10-10]
 ]
-#open the bought.csv in the write mode
-with open('bought.csv', 'w') as f:
-    #create the csv writer
-    writer = csv.writer(f)
-    #write the header
-    writer.writerow(header)
-    #write the data, multiple rows
-    writer.writerows(data)
-    print(f)
-    #import argparse for help function in command line
-    #start initiating argparse
-def Superpy(buy, command_line):
-    parser = argparse.ArgumentParser('Superpy')
-    parser.add_argument('--debug', action='store_true', help ='print debug info')
-    subparsers = parser.add_subparsers(dest = 'command')
-    #id, product_name and expiration date of the products bought, content of the file bought.csv
-    buy = subparsers.add_parser('id', type = int, help = 'identification number of the bought product')
-    buy.add_argument('product_name', type = str, help='name of the product')
-    buy.add_argument('expiration_date', type = float, help ='expiration date: yyyy-mm-dd')
-    #end of initiation argparse
-    args = parser.parse_args()
-    #implement current date as datet with datetime module
-    current_date = dt.date.today()
-    print(current_date)
-    datet = '2022-08-03'
-    #implement Expiration date with datetime module, strptime
-    ExpirationDate = datetime.strptime(datet, '%Y-%m-%d').date()
-    now = date.today()
-    if ExpirationDate >= now:
-        print('expired')
-    elif ExpirationDate == now:
-        print('50% discount')
-    else: 
-        print('expiration date 2022-10-10')
-
-#import CSV module to write and read csv files
-#implement the header of the sold.csv
-header = ['id', 'bought_id', 'sell_date', 'sell_price']
-data = [
-    [1, '1.milk', 2022-10-13, 2.50]
-    [2, '2.bread', 2022-10-14, 3.50]
-    [3, '3.butter', 2022-10-15, 4.50]
+csv_sell_rowlist = [
+    ['id', 'product_name', 'sell_date', 'sell_price']
+    [1, 'milk', 2022-10-13, 2.50]
+    [2, 'bread', 2022-10-14, 3.50]
+    [3, 'butter', 2022-10-15, 4.50]
 ]
-#open the sold.csv in the write mode
-with open('sold.csv', 'w') as f:
-    #create the csv writer
-    writer = csv.writer(f)
-    #write the header
-    writer.writerow(header)
-    #write the data, multiple rows
-    writer.writerows(data)
-    print(f)
-    #import argparse for help function in command line
-    #start initiating argparse
-def Superpy(sell, command_line):
-    parser = argparse.ArgumentParser('Superpy')
-    parser.add_argument('--debug', action='store_true', help ='print debug info')
-    subparsers = parser.add_subparsers(dest = 'command')
-    #id, bought_id, sell_date and sell_price of the products sold, content of the file sold.csv
-    sell = subparsers.add_parser('id', type = int, help = 'identification number of the sold product')
-    sell.add_argument('sell_date', type = int, help = 'date of the sold product') 
-    sell.add_argument('sell_price', type = float, help = 'price of the sold product') 
-    #end of initiation argparse
-    args = parser.parse_args()
+
+with open('buy.csv', 'w', newline = ' ') as file:
+    writer = csv.writer(file, delimiter=' ')
+    writer.writerows(csv_buy_rowlist)
+
+with open('sell.csv', 'w', newline = ' ') as file:
+    writer = csv.writer(file, delimiter=' ')
+    writer.writerows(csv_sell_rowlist)
+
 
 
 if __name__ == "__main__":
