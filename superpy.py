@@ -16,7 +16,15 @@ __human_name__ = "superpy"
 
 # Your code below this line.
 def main():
-    pass
+    if args.command == 'activate inventory': 
+        print('inventory function activated')
+    elif args.command == 'inventory':
+        print(bought_product(),sold_product())
+    elif args.command == 'buy':
+        print(bought_product())
+    elif args.command == 'sell':
+        print(sold_product())
+
 
 def valid_date(s):
     try:
@@ -97,14 +105,6 @@ def sold_product():
         csv.reader=csv.reader(file)
         for line in csv.reader:
             print(line)
-
-def inventory():
-    if args.command == 'inventory':
-        print(bought_product(),sold_product())
-    elif args.command == 'buy':
-        print(bought_product())
-    elif args.command == 'sell':
-        print(sold_product())
 
         
 
