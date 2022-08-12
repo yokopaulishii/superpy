@@ -32,7 +32,7 @@ def buy(args):
     with open('buy.csv', 'r') as file:
         csv.reader = csv.reader(file)
         for line in csv.reader:
-            return buy.csv
+            return vars(buy.csv)
             
 
 #define rows in sell.csv
@@ -51,7 +51,7 @@ def sell(args):
     with open('sell.csv', 'r') as file:
         csv.reader=csv.reader(file)
         for line in csv.reader:
-            return sell.csv
+            return vars(sell.csv)
 
 def valid_date(s):
     try:
@@ -73,7 +73,7 @@ def report(args):
     with open('sell.csv','buy.csv' 'r') as file:
         csv.reader=csv.reader(file)
         for line in csv.reader:
-            return sell(args), buy(args)
+            return vars(sell(args), buy(args))
 
 def parser():
 #create the parent parser superpy and subparsers for her children buy and sell
@@ -92,25 +92,25 @@ def parser():
     buy.add_argument('id', help='identification number of the product bought', type = int)
     buy.add_argument('product_name', help = 'name of the product bought', type = str)
     buy.add_argument('buy_price', help='cost price of the product bought', type = float)
-    buy.add_argument('expiration_date', help = 'expiration date - format: YYYY-MM-DD', required = True, type = valid_date)
-#define parser argument for sell
+    buy.add_argument('-expiration_date', help = 'expiration date - format: YYYY-MM-DD', required = True, type = valid_date)
+#define argument for sell parser
     sell.add_argument('id', help='identification number of the product sold', type = int)
     sell.add_argument('bought_id', help = 'name of the product bought', type = str)
-    sell.add_argument('sell_date', help='date of the product sold - format: YYYY-MM-DD', required = True, type = valid_date)
+    sell.add_argument('-sell_date', help='date of the product sold - format: YYYY-MM-DD', required = True, type = valid_date)
     sell.add_argument('sell-price', help='price of the product sold', type = float)
 #execute the parse_args() method
     args = parser.parse_args()
-    return parser(args)
+    return vars(args)
     
-def main(command):
-    args = parser
+def main():
+    args = parser()
     if args.command == 'report':
         buy(args), sell(args)
     elif args.command == 'buy':
         buy(args)
     elif args.command == 'sell':
         sell(args)
-    return args.command
+    return vars(main)
 
 if __name__ == "__main__":
     main()
