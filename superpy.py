@@ -23,8 +23,8 @@ csv_buy_rowlist = [
     [2, 'bread', 2.50, 2022-10-10],
     [3, 'butter', 3.50, 2022-10-10]
 ]
-#write buy.csv
-def bought_product(args):
+#write buy.csv in buy function
+def buy(args):
     with open('buy.csv', 'w') as file:
         writer = csv.writer(file)
         writer.writerows(csv_buy_rowlist)
@@ -32,7 +32,7 @@ def bought_product(args):
     with open('buy.csv', 'r') as file:
         csv.reader = csv.reader(file)
         for line in csv.reader:
-            return print(line)
+            return buy.csv
             
 
 #define rows in sell.csv
@@ -42,8 +42,8 @@ csv_sell_rowlist = [
     [2, 'bread', 2022-10-14, 3.50],
     [3, 'butter', 2022-10-15, 4.50]
 ]
-#write sell.csv
-def sold_product(args):
+#write sell.csv in sell function
+def sell(args):
     with open('sell.csv', 'w') as file:
         writer = csv.writer(file)
         writer.writerows(csv_sell_rowlist)
@@ -51,7 +51,7 @@ def sold_product(args):
     with open('sell.csv', 'r') as file:
         csv.reader=csv.reader(file)
         for line in csv.reader:
-            return print(line)
+            return sell.csv
 
 def valid_date(s):
     try:
@@ -68,6 +68,12 @@ print("Yesterday was: ", yesterday)
 # Get 2 days earlier
 yesterday = today - timedelta(days = 2)
 print("Day before yesterday was: ", yesterday)
+
+def report(args):
+    with open('sell.csv','buy.csv' 'r') as file:
+        csv.reader=csv.reader(file)
+        for line in csv.reader:
+            return sell(args), buy(args)
 
 def parser():
 #create the parent parser superpy and subparsers for her children buy and sell
@@ -94,20 +100,17 @@ def parser():
     sell.add_argument('sell-price', help='price of the product sold', type = float)
 #execute the parse_args() method
     args = parser.parse_args()
-    return 
+    return parser(args)
     
-def main(args):
-    if args == parser:
-        args.command
-    elif args.command == 'inventory': 
-        print('inventory function activated')
-    elif args.command == 'inventory report':
-        print(bought_product(),sold_product())
+def main(command):
+    args = parser
+    if args.command == 'report':
+        buy(args), sell(args)
     elif args.command == 'buy':
-        print(bought_product())
+        buy(args)
     elif args.command == 'sell':
-        print(sold_product())
-    return 
+        sell(args)
+    return args.command
 
 if __name__ == "__main__":
     main()
