@@ -8,43 +8,6 @@ import datetime as dt
 import time
 from csv import writer
 
-fields = ['buy_id', 'product_name', 'bought_quantity', 'buy_price', 'expiration_date']
-def buy(buy_id, product_name, buy_price, expiration_date):
-    with open('buy.csv', 'w') as csvfile:
-        csvwriter=csv.writer(csvfile)
-        csvwriter.writerow(fields)
-    new_products_bought = [buy_id, product_name, buy_price, expiration_date]
-    with open('buy.csv', 'a') as f_object:
-        writer_object=writer(f_object)
-        writer_object.writerow(new_products_bought)
-        f_object.close()
-    with open('buy.csv', 'r') as file:
-        csvFile=csv.reader(file)
-        for lines in csvFile:
-            print(lines)
-
-fields = ['sell_id', 'bought_name', 'sold_quantity', 'sell_date', 'sell_price']
-def sell(sell_id, bought_name, sold_quantity, sell_date, sell_price):
-    with open('sell.csv', 'w') as csvfile:
-        csvwriter=csv.writer(csvfile)
-        csvwriter.writerow(fields)
-    new_products_bought = [sell_id, bought_name, sold_quantity, sell_date, sell_price]
-    with open('sell.csv', 'a') as f_object:
-        writer_object=writer(f_object)
-        writer_object.writerow(new_products_bought)
-        f_object.close()
-    with open('sell.csv', 'r') as file:
-        csvFile=csv.reader(file)
-        for lines in csvFile:
-            print(lines)
-
-def report(inventory, revenue, profit):
-    if 'report' and 'inventory':
-        with open('sell.csv', 'r') as file:
-            csvFile=csv.reader(file)
-        for lines in csvFile:
-            print(lines)
-
 def valid_date(s):
     #today
     today = date.today()
@@ -57,7 +20,40 @@ def valid_date(s):
     except ValueError:
          msg = "not a valid date: {0!r}".format(s)
     raise argparse.ArgumentTypeError(msg)
+
+fields = ['buy_id', 'product_name', 'bought_quantity', 'buy_price', 'expiration_date']
+def buy(buy_id, bought_quantity, product_name, buy_price, expiration_date):
+    new_products_bought = [buy_id, bought_quantity, product_name, buy_price, expiration_date]
+    with open('buy.csv', 'a') as f_object:
+        writer_object=writer(f_object)
+        writer_object.writerow(new_products_bought)
+        f_object.close()
+
+fields = ['sell_id', 'bought_name', 'sold_quantity', 'sell_date', 'sell_price']
+def sell(sell_id, bought_name, sold_quantity, sell_date, sell_price):
+    new_products_bought = [sell_id, bought_name, sold_quantity, sell_date, sell_price]
+    with open('sell.csv', 'a') as f_object:
+        writer_object=writer(f_object)
+        writer_object.writerow(new_products_bought)
+        f_object.close()
                                             
+def report(inventory, revenue, profit):
+    #today
+    today = date.today()
+    #yesterday
+    yesterday = today - timedelta(days = 1)
+    # Get 2 days earlier
+    yesterday2 = today - timedelta(days = 2)
+    if 'inventory' == today:
+        with open('buy.csv', 'r') as file:
+            csvFile=csv.reader(file)
+        for lines in csvFile:
+            print(lines)
+    elif 'revenue' == valid_date:
+        with open('sell.csv', 'r') as file:
+            csvFile=csv.reader(file)
+        for lines in csvFile:
+            print(lines)
 
 def parser():
     parser = argparse.ArgumentParser()
@@ -89,7 +85,7 @@ def parser():
 def main():
     args = parser()
     if args.command == 'buy':
-        buy(args.buy_id, args.product_name, args.buy_price, args.expiration_date)
+        buy(args.buy_id, args.product_name, args.bought_quantity, args.buy_price, args.expiration_date)
     elif args.command == 'sell':
         sell(args.sell_id, args.bought_name, args.sold_quantity, args.sell_date, args.sell_price)
     elif args.command == 'report':
