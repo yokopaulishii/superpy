@@ -5,15 +5,13 @@ from datetime import timedelta
 from datetime import tzinfo
 from datetime import datetime, date
 import datetime as dt
+from fcntl import F_DUPFD
 import time
 from csv import writer
 
 def valid_date(s):
-    #today
     today = date.today()
-    #yesterday
     yesterday = today - timedelta(days = 1)
-    # Get 2 days earlier
     yesterday2 = today - timedelta(days = 2)
     try:
         return datetime.strptime(s, "%Y-%m-%d")
@@ -28,32 +26,34 @@ def buy(buy_id, bought_quantity, product_name, buy_price, expiration_date):
         writer_object=writer(f_object)
         writer_object.writerow(new_products_bought)
         f_object.close()
+    with open('inventory.csv', 'w') as writeobj:
+        writer=csv.writer(writeobj)
+        writer.writerows(f_object)
+        f_object.close()
 
-fields = ['sell_id', 'bought_name', 'sold_quantity', 'sell_date', 'sell_price']
-def sell(sell_id, bought_name, sold_quantity, sell_date, sell_price):
-    new_products_bought = [sell_id, bought_name, sold_quantity, sell_date, sell_price]
+fields = ['sell_id', 'sold_name', 'sold_quantity', 'sell_date', 'sell_price']
+def sell(sell_id, sold_name, bought_quantity, sold_quantity, sell_date, sell_price):
+    new_products_sold = [sell_id, sold_name, sold_quantity, sell_date, sell_price]
     with open('sell.csv', 'a') as f_object:
         writer_object=writer(f_object)
-        writer_object.writerow(new_products_bought)
+        writer_object.writerow(new_products_sold)
         f_object.close()
-                                            
+    with open('inventory.csv' 'r') as file: 
+        csv.reader=csv.reader(file)
+        for sold_quantity in csv.reader:
+            if sold_quantity >= bought_quantity:
+                while True:
+                    if sold_quantity == 0:
+                        break
+                    else:
+                        print('This product is not in inventory and cannot be sold')
+
+
+    
+       
 def report(inventory, revenue, profit):
-    #today
-    today = date.today()
-    #yesterday
-    yesterday = today - timedelta(days = 1)
-    # Get 2 days earlier
-    yesterday2 = today - timedelta(days = 2)
-    if 'inventory' == today:
-        with open('buy.csv', 'r') as file:
-            csvFile=csv.reader(file)
-        for lines in csvFile:
-            print(lines)
-    elif 'revenue' == valid_date:
-        with open('sell.csv', 'r') as file:
-            csvFile=csv.reader(file)
-        for lines in csvFile:
-            print(lines)
+        print('ok')
+    
 
 def parser():
     parser = argparse.ArgumentParser()
@@ -70,16 +70,15 @@ def parser():
     # Build sell parser
     sell_parser = subparsers.add_parser('sell', help='register sold product')
     sell_parser.add_argument('--sell_id', help='insert product bought id', type=int)
-    sell_parser.add_argument('--bought_name', help='insert name of the product bought')
+    sell_parser.add_argument('--sold_name', help='insert name of the product sold')
     sell_parser.add_argument('--sold_quantity', help='insert quantity of the product sold', type=int)
     sell_parser.add_argument('--sell_date', help='insert date of the sold product - format: YYYY-mm-dd', type=valid_date)
     sell_parser.add_argument('--sell_price', help='insert price of the product sold', type=float)
-
+    
     # Build report parser
-    report_parser = subparsers.add_parser('report', help='report transactions')
-    report_parser.add_argument('--inventory', help='report inventory - format:YYYY-mm-dd', type=valid_date)
-    report_parser.add_argument('--revenue', help='report revenue - format:YYYY-mm-dd', type=valid_date)
-    report_parser.add_argument('--profit', help='report inventory - format:YYYY-mm-dd', type=valid_date)
+    report_parser.add_argument('--inventory', help='insert date of report inventory - format: YYYY-mm-dd', type=valid_date)
+    report_parser.add_argument('--revenue', help='insert date of report revenue - format: YYYY-mm-dd', type=valid_date)
+    report_parser.add_argument('--profit', help='insert date of report inventory - format: YYYY-mm-dd', type=valid_date)
     return parser.parse_args()
 
 def main():
@@ -87,7 +86,7 @@ def main():
     if args.command == 'buy':
         buy(args.buy_id, args.product_name, args.bought_quantity, args.buy_price, args.expiration_date)
     elif args.command == 'sell':
-        sell(args.sell_id, args.bought_name, args.sold_quantity, args.sell_date, args.sell_price)
+        sell(args.sell_id, args.sold_name, args.sold_quantity, args.sell_date, args.sell_price)
     elif args.command == 'report':
         report(args.inventory, args.revenue, args.profit)
 
