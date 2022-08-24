@@ -5,7 +5,6 @@ from datetime import timedelta
 from datetime import tzinfo
 from datetime import datetime, date
 import datetime as dt
-from fcntl import F_DUPFD
 import time
 from csv import writer
 
@@ -22,14 +21,10 @@ def valid_date(s):
 fields = ['buy_id', 'product_name', 'bought_quantity', 'buy_price', 'expiration_date']
 def buy(buy_id, bought_quantity, product_name, buy_price, expiration_date):
     new_products_bought = [buy_id, bought_quantity, product_name, buy_price, expiration_date]
-    with open('buy.csv', 'a') as f_object:
-        writer_object=writer(f_object)
+    with open('buy.csv', 'a') as f_object, open('inventory.csv', 'a')as f_object2:
+        writer_object=writer(f_object, f_object2)
         writer_object.writerow(new_products_bought)
-        f_object.close()
-    with open('inventory.csv', 'w') as writeobj:
-        writer=csv.writer(writeobj)
-        writer.writerows(f_object)
-        f_object.close()
+        f_object.close(), f_object2.close()
 
 fields = ['sell_id', 'sold_name', 'sold_quantity', 'sell_date', 'sell_price']
 def sell(sell_id, sold_name, bought_quantity, sold_quantity, sell_date, sell_price):
@@ -66,6 +61,14 @@ def parser():
     buy_parser.add_argument('--product_name', help='insert name of the product bought')
     buy_parser.add_argument('--buy_price', help='insert product price', type=float)
     buy_parser.add_argument('--expiration_date', help='best before- format: YYYY-mm-dd', type=valid_date)
+
+    #inventory parser
+    inventory_parser = subparsers.add_parser('inventory', help='register purchased product')
+    inventory_parser.add_argument('--buy_id', help='insert product id', type=int)
+    inventory_parser.add_argument('--bought_quantity', help='insert quantity of the product bought', type=int)
+    inventory_parser.add_argument('--product_name', help='insert name of the product bought')
+    inventory_parser.add_argument('--buy_price', help='insert product price', type=float)
+    inventory_parser.add_argument('--expiration_date', help='best before- format: YYYY-mm-dd', type=valid_date)
    
     # Build sell parser
     sell_parser = subparsers.add_parser('sell', help='register sold product')
@@ -76,6 +79,7 @@ def parser():
     sell_parser.add_argument('--sell_price', help='insert price of the product sold', type=float)
     
     # Build report parser
+    report_parser = subparsers.add_parser('report', help='report transaction')
     report_parser.add_argument('--inventory', help='insert date of report inventory - format: YYYY-mm-dd', type=valid_date)
     report_parser.add_argument('--revenue', help='insert date of report revenue - format: YYYY-mm-dd', type=valid_date)
     report_parser.add_argument('--profit', help='insert date of report inventory - format: YYYY-mm-dd', type=valid_date)
@@ -83,7 +87,7 @@ def parser():
 
 def main():
     args = parser()
-    if args.command == 'buy':
+    if args.command == 'buy' and 'inventory':
         buy(args.buy_id, args.product_name, args.bought_quantity, args.buy_price, args.expiration_date)
     elif args.command == 'sell':
         sell(args.sell_id, args.sold_name, args.sold_quantity, args.sell_date, args.sell_price)
