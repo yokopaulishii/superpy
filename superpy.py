@@ -25,27 +25,28 @@ def buy(buy_id, bought_quantity, product_name, buy_price, expiration_date):
         writer_object=writer(f_object, f_object2)
         writer_object.writerow(new_products_bought)
         f_object.close(), f_object2.close()
+    with open('inventory.csv', 'a')as f_object2:
+        writer_object=writer(f_object2)
+        writer_object.writerow(new_products_bought)
+        f_object2.close()
 
 fields = ['sell_id', 'sold_name', 'sold_quantity', 'sell_date', 'sell_price']
-def sell(sell_id, sold_name, bought_quantity, sold_quantity, sell_date, sell_price):
+def sell(sell_id, sold_name, sold_quantity, bought_quantity, sell_date, sell_price):
     new_products_sold = [sell_id, sold_name, sold_quantity, sell_date, sell_price]
-    with open('sell.csv', 'a') as f_object:
-        writer_object=writer(f_object)
-        writer_object.writerow(new_products_sold)
-        f_object.close()
-    with open('inventory.csv' 'r') as file: 
-        csv.reader=csv.reader(file)
-        for sold_quantity in csv.reader:
+    with open('inventory.csv' 'r') as f_object2: 
+        csv.reader=csv.reader(f_object2)
+        for sold_quantity in f_object2:
             if sold_quantity >= bought_quantity:
                 while True:
                     if sold_quantity == 0:
                         break
                     else:
                         print('This product is not in inventory and cannot be sold')
-
-
+    with open('sell.csv', 'a') as f_object:
+        writer_object=writer(f_object)
+        writer_object.writerow(new_products_sold)
+        f_object.close()
     
-       
 def report(inventory, revenue, profit):
         print('ok')
     
