@@ -18,34 +18,54 @@ def valid_date(s):
          msg = "not a valid date: {0!r}".format(s)
     raise argparse.ArgumentTypeError(msg)
 
+#to define fieldname of buy.csv file
 fields = ['buy_id', 'product_name', 'bought_quantity', 'buy_price', 'expiration_date']
+#start buy function with parsed arguments for buy.csv
 def buy(buy_id, bought_quantity, product_name, buy_price, expiration_date):
+    #new products that will be inserted in terminal under buy parse implemented in a list
     new_products_bought = [buy_id, bought_quantity, product_name, buy_price, expiration_date]
-    with open('buy.csv', 'a') as f_object, open('inventory.csv', 'a')as f_object2:
-        writer_object=writer(f_object, f_object2)
+    #open a buy.csv in append mode
+    with open('buy.csv', 'a') as f_object:
+        writer_object=writer(f_object)
         writer_object.writerow(new_products_bought)
-        f_object.close(), f_object2.close()
+        f_object.close()
+    #in order to simultaneously add the same new products to both inventory and to buy.csv, open inventory.csv with append
     with open('inventory.csv', 'a')as f_object2:
         writer_object=writer(f_object2)
         writer_object.writerow(new_products_bought)
         f_object2.close()
+    #this is an attempt to sum up all variables of bought_quantity in inventory.csv
+    with open('inventory.csv') as f_object2:
+        f_object2.next()
+        total=sum(int(bought_quantity[2])for bought_quantity in csv.reader(f_object2))
+        print(total)
+        print(bought_quantity)
 
+#define parsed sell arguments as fieldnames for sell function
 fields = ['sell_id', 'sold_name', 'sold_quantity', 'sell_date', 'sell_price']
-def sell(sell_id, sold_name, sold_quantity, bought_quantity, sell_date, sell_price):
+#initialize sell function with parsed sell arguments
+def sell(sell_id, sold_name, sold_quantity, sell_date, sell_price):
+    #implement parsed sell arguments in a list so you can insert new products in terminal
     new_products_sold = [sell_id, sold_name, sold_quantity, sell_date, sell_price]
-    with open('inventory.csv' 'r') as f_object2: 
+    #open inventory.csv first to check if there is enough stock before sell function is initiated
+    with open('inventory.csv', 'r') as f_object2: 
+        #this is an attempt to sum up all bought_quantity in inventory.csv
+        total=sum(int(bought_quantity[2])for bought_quantity in csv.reader(f_object2))
         csv.reader=csv.reader(f_object2)
+        #to loop over all sold_quantity in inventory.csv
         for sold_quantity in f_object2:
-            if sold_quantity >= bought_quantity:
+            #if the total sum of sold_quantity is more than total (in inventory defined) 
+            if sold_quantity < total:
+                #if it is true
                 while True:
-                    if sold_quantity == 0:
-                        break
-                    else:
-                        print('This product is not in inventory and cannot be sold')
-    with open('sell.csv', 'a') as f_object:
-        writer_object=writer(f_object)
-        writer_object.writerow(new_products_sold)
-        f_object.close()
+                    #then print following comment in terminal:
+                    print('This product is not in inventory and cannot be sold')     
+            #otherwise open sell.csv and append new products that are sold and save
+            else:
+                with open('sell.csv', 'a') as f_object:
+                    writer_object=writer(f_object)
+                    writer_object.writerow(new_products_sold)
+                    f_object.close()
     
 def report(inventory, revenue, profit):
         print('ok')
@@ -70,6 +90,7 @@ def parser():
     inventory_parser.add_argument('--product_name', help='insert name of the product bought')
     inventory_parser.add_argument('--buy_price', help='insert product price', type=float)
     inventory_parser.add_argument('--expiration_date', help='best before- format: YYYY-mm-dd', type=valid_date)
+    inventory_parser.add_argument('--date', help='specify the date of the inventory - format: YYYY-mm-dd', type=valid_date)
    
     # Build sell parser
     sell_parser = subparsers.add_parser('sell', help='register sold product')
@@ -97,3 +118,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
