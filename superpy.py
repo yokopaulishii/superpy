@@ -34,12 +34,6 @@ def buy(buy_id, bought_quantity, product_name, buy_price, expiration_date):
         writer_object=writer(f_object2)
         writer_object.writerow(new_products_bought)
         f_object2.close()
-    #this is an attempt to sum up all variables of bought_quantity in inventory.csv
-    with open('inventory.csv') as f_object2:
-        f_object2.next()
-        total=sum(int(bought_quantity[2])for bought_quantity in csv.reader(f_object2))
-        print(total)
-        print(bought_quantity)
 
 #define parsed sell arguments as fieldnames for sell function
 fields = ['sell_id', 'sold_name', 'sold_quantity', 'sell_date', 'sell_price']
@@ -48,14 +42,22 @@ def sell(sell_id, sold_name, sold_quantity, sell_date, sell_price):
     #implement parsed sell arguments in a list so you can insert new products in terminal
     new_products_sold = [sell_id, sold_name, sold_quantity, sell_date, sell_price]
     #open inventory.csv first to check if there is enough stock before sell function is initiated
+    #attempt to sum up the values inside bought_quantity in line#2 with loop
+    total_bought=0
     with open('inventory.csv', 'r') as f_object2: 
-        #this is an attempt to sum up all bought_quantity in inventory.csv
-        total=sum(int(bought_quantity[2])for bought_quantity in csv.reader(f_object2))
-        csv.reader=csv.reader(f_object2)
-        #to loop over all sold_quantity in inventory.csv
+        csvFile=csv.reader(f_object2, delimiter='', quotechar='|')
+        for line in csvFile:
+            total_bought+=int(line[2])
+    #attempt to sum up the values inside sold_quantity in line#2 with loop - need total_sold for revenue and profit
+    total_sold=0
+    with open('sell.csv', 'r') as f_object:
+        csvFile=csv.reader(f_object2, delimiter='', quotechar='|')
+        for line in csvFile:
+            for line in csvFile:
+                total_sold+=int(line[2])
+        #if the total sum of sold_quantity is more than total (in inventory defined) 
         for sold_quantity in f_object2:
-            #if the total sum of sold_quantity is more than total (in inventory defined) 
-            if sold_quantity < total:
+            if sold_quantity < total_bought:
                 #if it is true
                 while True:
                     #then print following comment in terminal:
@@ -66,9 +68,15 @@ def sell(sell_id, sold_name, sold_quantity, sell_date, sell_price):
                     writer_object=writer(f_object)
                     writer_object.writerow(new_products_sold)
                     f_object.close()
-    
+#if inserted in terminal report then initiate 
 def report(inventory, revenue, profit):
-        print('ok')
+    #open inventory.csv to read content
+    with open('inventory.csv', 'r')as f_object2:
+        #reading the csvFile
+        csvFile=csv.reader(f_object2)
+        #displaying the contents of the csvFile
+        for lines in csvFile:
+            print(lines)
     
 
 def parser():
