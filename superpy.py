@@ -38,11 +38,27 @@ def buy(buy_id, bought_quantity, product_name, buy_price, expiration_date):
     with open('inventory.csv', 'a')as f_object2:
         writer_object=writer(f_object2)
         writer_object.writerow(new_products_bought)
-
-#read buy.csv in pandas
-df=pd.read_csv('buy.csv')
-df.head()
-
+    #make profit.csv to receive profit data
+    with open('profit.csv', 'w')as f_object3:
+        writer_object=writer(f_object3)
+        writer_object.writerows()
+    #read buy.csv in pandas   
+    buy_data=pd.read_csv('buy.csv')
+    #add a purchase cost column in buy.csv
+    buy_data['purchase cost']=buy_data['buy_price']*buy_data['bought_quantity']
+    #add a profit column in buy.csv
+    buy_data['profit']=buy_data['revenue']-buy_data['purchase cost']
+    #changing from str to int of these columns to iterate
+    buy_data['bought_quantity']=pd.to_numeric(buy_data['bought_quantity'])
+    buy_data['buy_price']=pd.to_numeric(buy_data['buy_price'])
+    buy_data.head()
+    #total sum of revenue
+    buy_results=buy_data.groupby('buy_date').sum()['profit']
+    #send profit data to profit csv
+    buy_results.to_csv('profit.csv')
+    #visualize sell.csv
+    plt.plot(buy_results.index, buy_results.values)
+    plt.show()
 
 #define parsed sell arguments as fieldnames for sell function
 fields = ['sell_id', 'sold_name', 'sold_quantity', 'sell_date', 'sell_price']
@@ -54,30 +70,52 @@ def sell(sell_id, sold_name, sold_quantity, sell_date, sell_price):
     with open('sell.csv', 'a') as f_object:
         writer_object=writer(f_object)
         writer_object.writerow(new_products_sold)
-#read sell.csv in pandas
-sell_data=pd.read_csv('sell.csv')
-#add a sales column to sell.csv
-sell_data['revenue']=sell_data['sold_quantity']*sell_data['sell_price']
-sell_data['sold_quantity']=pd.to_numeric(sell_data['sold_quantity'])
-sell_data['sell_price']=pd.to_numeric(sell_data['sell_price'])
-sell_data.head()
-#total sum of revenue
-results=sell_data.groupby('sell_date').sum()['revenue']
-#visualize sell.csv
-plt.plot(results.index, results.values)
-plt.show()
+    #open revenue.csv to receive revenue data
+    with open('revenue.csv', 'w')as f_object3:
+        writer_object=writer(f_object3)
+        writer_object.writerows()
+    #read sell.csv in pandas
+    sell_data=pd.read_csv('sell.csv')
+    #add a revenue column to sell.csv
+    sell_data['revenue']=sell_data['sold_quantity']*sell_data['sell_price']
+    #changing str to int in these two columns to iterate
+    sell_data['sold_quantity']=pd.to_numeric(sell_data['sold_quantity'])
+    sell_data['sell_price']=pd.to_numeric(sell_data['sell_price'])
+    sell_data.head()
+    #total sum of revenue
+    sell_results=sell_data.groupby('sell_date').sum()['revenue']
+    sell_results=pd.read_csv('revenue.csv')
+    #send revenue data to revenue.csv
+    sell_results.to_csv('revenue.csv')
+    #visualize sell.csv
+    plt.plot(sell_results.index, sell_results.values)
+    plt.show()
 
-   
 
 #if inserted in terminal report then initiate 
 def report(inventory, revenue, profit):
     #open inventory.csv to read content
-    with open('inventory.csv', 'r')as f_object2:
-        #reading the csvFile
-        csvFile=csv.reader(f_object2)
-        #displaying the contents of the csvFile
-        for lines in csvFile:
-            print(lines)
+    if 'inventory':
+        with open('inventory.csv', 'r')as f_object2:
+            #reading the csvFile
+            csvFile=csv.reader(f_object2)
+            #displaying the contents of the csvFile
+            for lines in csvFile:
+                print(lines)
+    if 'revenue':
+        with open('revenue.csv', 'r')as f_object3:
+            #reading the csvFile
+            csvFile=csv.reader(f_object3)
+            #displaying the contents of the csvFile
+            for lines in csvFile:
+                print(lines)
+    if 'profit':
+        with open('profit.csv', 'r')as f_object4:
+            #reading the csvFile
+            csvFile=csv.reader(f_object4)
+            #displaying the contents of the csvFile
+            for lines in csvFile:
+                print(lines)
     
 def parser():
     parser = argparse.ArgumentParser()
@@ -122,4 +160,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
