@@ -7,6 +7,12 @@ from datetime import datetime, date
 import datetime as dt
 import time
 from csv import writer
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from itertools import combinations
+from collections import Counter
+
 
 def valid_date(s):
     today = date.today()
@@ -33,6 +39,11 @@ def buy(buy_id, bought_quantity, product_name, buy_price, expiration_date):
         writer_object=writer(f_object2)
         writer_object.writerow(new_products_bought)
 
+#read buy.csv in pandas
+df=pd.read_csv('buy.csv')
+df.head()
+
+
 #define parsed sell arguments as fieldnames for sell function
 fields = ['sell_id', 'sold_name', 'sold_quantity', 'sell_date', 'sell_price']
 #initialize sell function with parsed sell arguments
@@ -40,30 +51,23 @@ def sell(sell_id, sold_name, sold_quantity, sell_date, sell_price):
     #implement parsed sell arguments in a list so you can insert new products in terminal
     new_products_sold = [sell_id, sold_name, sold_quantity, sell_date, sell_price]
     #open inventory.csv first to check if there is enough stock before sell function is initiated
-    #attempt to sum up the values inside bought_quantity in line#2 with loop
-    total_bought=0
-    with open('inventory.csv', 'r') as f_object2: 
-        csvFile=csv.reader(f_object2, delimiter='', quotechar='|')
-        for line in csvFile:
-            total_bought+=int(line[0,2])
-    #attempt to sum up the values inside sold_quantity (line#2) and sell_id (line#1) with loop - need total_sold for revenue and profit
-    total_sold=0
-    with open('sell.csv', 'r') as f_object:
-        csvFile=csv.reader(f_object2, delimiter='', quotechar='|')
-        for line in csvFile:
-            total_sold+=int(line[0,2])
-        #if the total sum of sold_quantity is more than total (in inventory defined) 
-        for sold_quantity in f_object2:
-            if sold_quantity < total_bought:
-                #if it is true
-                while True:
-                    #then print following comment in terminal:
-                    print('This product is not in inventory and cannot be sold')     
-            #otherwise open sell.csv and append new products that are sold
-            else:
-                with open('sell.csv', 'a') as f_object:
-                    writer_object=writer(f_object)
-                    writer_object.writerow(new_products_sold)
+    with open('sell.csv', 'a') as f_object:
+        writer_object=writer(f_object)
+        writer_object.writerow(new_products_sold)
+#read sell.csv in pandas
+sell_data=pd.read_csv('sell.csv')
+#add a sales column to sell.csv
+sell_data['revenue']=sell_data['sold_quantity']*sell_data['sell_price']
+sell_data['sold_quantity']=pd.to_numeric(sell_data['sold_quantity'])
+sell_data['sell_price']=pd.to_numeric(sell_data['sell_price'])
+sell_data.head()
+#total sum of revenue
+results=sell_data.groupby('sell_date').sum()['revenue']
+#visualize sell.csv
+plt.plot(results.index, results.values)
+plt.show()
+
+   
 
 #if inserted in terminal report then initiate 
 def report(inventory, revenue, profit):
