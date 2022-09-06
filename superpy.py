@@ -38,10 +38,48 @@ def buy(buy_id, bought_quantity, product_name, buy_price, expiration_date):
     with open('inventory.csv', 'a')as f_object2:
         writer_object=writer(f_object2)
         writer_object.writerow(new_products_bought)
-    #make profit.csv to receive profit data
-    with open('profit.csv', 'w')as f_object3:
+   
+
+#define parsed sell arguments as fieldnames for sell function
+fields = ['sell_id', 'sold_name', 'sold_quantity', 'sell_date', 'sell_price']
+#initialize sell function with parsed sell arguments
+def sell(sell_id, sold_name, sold_quantity, sell_date, sell_price):
+    #implement parsed sell arguments in a list so you can insert new products in terminal
+    new_products_sold = [sell_id, sold_name, sold_quantity, sell_date, sell_price]
+    #open inventory.csv first to check if there is enough stock before sell function is initiated
+    with open('sell.csv', 'a') as f_object3:
         writer_object=writer(f_object3)
-        writer_object.writerows()
+        writer_object.writerow(new_products_sold)
+    #open revenue.csv to receive revenue data
+
+fields=['sell_prijs', 'sold_quantity','revenue']
+def report(revenue, inventory, profit):
+    revenue = ['sell_prijs', 'sold_quantity', 'revenue']
+    with open('revenue.csv', 'a')as f_object4:
+        writer_object=writer(f_object4)
+        writer_object.writerows(revenue)
+    #read sell.csv in pandas
+    sell_data=pd.read_csv('sell.csv')
+    #add a revenue column to sell.csv
+    sell_data['revenue']=sell_data['sold_quantity']*sell_data['sell_price']
+    #changing str to int in these two columns to iterate
+    sell_data['sold_quantity']=pd.to_numeric(sell_data['sold_quantity'])
+    sell_data['sell_price']=pd.to_numeric(sell_data['sell_price'])
+    sell_data.head()
+    #total sum of revenue
+    sell_results=sell_data.groupby('sell_date').sum()['revenue']
+    sell_results=pd.read_csv('revenue.csv')
+    #send revenue data to revenue.csv
+    sell_results.to_csv('revenue.csv')
+    #visualize sell.csv
+    plt.plot(sell_results.index, sell_results.values)
+    plt.show()
+fields = ['buy_price', 'bought_quantity', 'profit']
+profit = ['buy_price', 'bought_quantity', 'profit']
+     #make profit.csv to receive profit data
+with open('profit.csv', 'a')as f_object5:
+    writer_object=writer(f_object5)
+    writer_object.writerows(profit)
     #read buy.csv in pandas   
     buy_data=pd.read_csv('buy.csv')
     #add a purchase cost column in buy.csv
@@ -60,63 +98,7 @@ def buy(buy_id, bought_quantity, product_name, buy_price, expiration_date):
     plt.plot(buy_results.index, buy_results.values)
     plt.show()
 
-#define parsed sell arguments as fieldnames for sell function
-fields = ['sell_id', 'sold_name', 'sold_quantity', 'sell_date', 'sell_price']
-#initialize sell function with parsed sell arguments
-def sell(sell_id, sold_name, sold_quantity, sell_date, sell_price):
-    #implement parsed sell arguments in a list so you can insert new products in terminal
-    new_products_sold = [sell_id, sold_name, sold_quantity, sell_date, sell_price]
-    #open inventory.csv first to check if there is enough stock before sell function is initiated
-    with open('sell.csv', 'a') as f_object:
-        writer_object=writer(f_object)
-        writer_object.writerow(new_products_sold)
-    #open revenue.csv to receive revenue data
-    with open('revenue.csv', 'w')as f_object3:
-        writer_object=writer(f_object3)
-        writer_object.writerows()
-    #read sell.csv in pandas
-    sell_data=pd.read_csv('sell.csv')
-    #add a revenue column to sell.csv
-    sell_data['revenue']=sell_data['sold_quantity']*sell_data['sell_price']
-    #changing str to int in these two columns to iterate
-    sell_data['sold_quantity']=pd.to_numeric(sell_data['sold_quantity'])
-    sell_data['sell_price']=pd.to_numeric(sell_data['sell_price'])
-    sell_data.head()
-    #total sum of revenue
-    sell_results=sell_data.groupby('sell_date').sum()['revenue']
-    sell_results=pd.read_csv('revenue.csv')
-    #send revenue data to revenue.csv
-    sell_results.to_csv('revenue.csv')
-    #visualize sell.csv
-    plt.plot(sell_results.index, sell_results.values)
-    plt.show()
 
-
-#if inserted in terminal report then initiate 
-def report(inventory, revenue, profit):
-    #open inventory.csv to read content
-    if 'inventory':
-        with open('inventory.csv', 'r')as f_object2:
-            #reading the csvFile
-            csvFile=csv.reader(f_object2)
-            #displaying the contents of the csvFile
-            for lines in csvFile:
-                print(lines)
-    if 'revenue':
-        with open('revenue.csv', 'r')as f_object3:
-            #reading the csvFile
-            csvFile=csv.reader(f_object3)
-            #displaying the contents of the csvFile
-            for lines in csvFile:
-                print(lines)
-    if 'profit':
-        with open('profit.csv', 'r')as f_object4:
-            #reading the csvFile
-            csvFile=csv.reader(f_object4)
-            #displaying the contents of the csvFile
-            for lines in csvFile:
-                print(lines)
-    
 def parser():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest='command')
@@ -127,14 +109,6 @@ def parser():
     buy_parser.add_argument('--product_name', help='insert name of the product bought')
     buy_parser.add_argument('--buy_price', help='insert product price', type=float)
     buy_parser.add_argument('--expiration_date', help='best before- format: YYYY-mm-dd', type=valid_date)
-    #inventory parser
-    inventory_parser = subparsers.add_parser('inventory', help='register purchased product')
-    inventory_parser.add_argument('--buy_id', help='insert product id', type=int)
-    inventory_parser.add_argument('--bought_quantity', help='insert quantity of the product bought', type=int)
-    inventory_parser.add_argument('--product_name', help='insert name of the product bought')
-    inventory_parser.add_argument('--buy_price', help='insert product price', type=float)
-    inventory_parser.add_argument('--expiration_date', help='best before- format: YYYY-mm-dd', type=valid_date)
-    inventory_parser.add_argument('--date', help='specify the date of the inventory - format: YYYY-mm-dd', type=valid_date)
     # Build sell parser
     sell_parser = subparsers.add_parser('sell', help='register sold product')
     sell_parser.add_argument('--sell_id', help='insert product bought id', type=int)
