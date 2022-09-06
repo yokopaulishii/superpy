@@ -52,12 +52,8 @@ def sell(sell_id, sold_name, sold_quantity, sell_date, sell_price):
         writer_object.writerow(new_products_sold)
     #open revenue.csv to receive revenue data
 
-fields=['sell_prijs', 'sold_quantity','revenue']
+
 def report(revenue, inventory, profit):
-    revenue = ['sell_prijs', 'sold_quantity', 'revenue']
-    with open('revenue.csv', 'a')as f_object4:
-        writer_object=writer(f_object4)
-        writer_object.writerows(revenue)
     #read sell.csv in pandas
     sell_data=pd.read_csv('sell.csv')
     #add a revenue column to sell.csv
@@ -68,18 +64,9 @@ def report(revenue, inventory, profit):
     sell_data.head()
     #total sum of revenue
     sell_results=sell_data.groupby('sell_date').sum()['revenue']
-    sell_results=pd.read_csv('revenue.csv')
-    #send revenue data to revenue.csv
-    sell_results.to_csv('revenue.csv')
     #visualize sell.csv
     plt.plot(sell_results.index, sell_results.values)
     plt.show()
-fields = ['buy_price', 'bought_quantity', 'profit']
-profit = ['buy_price', 'bought_quantity', 'profit']
-     #make profit.csv to receive profit data
-with open('profit.csv', 'a')as f_object5:
-    writer_object=writer(f_object5)
-    writer_object.writerows(profit)
     #read buy.csv in pandas   
     buy_data=pd.read_csv('buy.csv')
     #add a purchase cost column in buy.csv
@@ -92,12 +79,9 @@ with open('profit.csv', 'a')as f_object5:
     buy_data.head()
     #total sum of revenue
     buy_results=buy_data.groupby('buy_date').sum()['profit']
-    #send profit data to profit csv
-    buy_results.to_csv('profit.csv')
     #visualize sell.csv
     plt.plot(buy_results.index, buy_results.values)
     plt.show()
-
 
 def parser():
     parser = argparse.ArgumentParser()
