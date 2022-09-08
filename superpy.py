@@ -12,7 +12,7 @@ import os
 import matplotlib.pyplot as plt
 from itertools import combinations
 from collections import Counter
-
+import rich
 
 def valid_date(s):
     today = date.today()
@@ -118,4 +118,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
 
